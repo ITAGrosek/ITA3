@@ -1,6 +1,7 @@
 package com.feri.reservation.model;
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
+
 import java.time.LocalDateTime;
 
 public class Reservation extends PanacheMongoEntity {

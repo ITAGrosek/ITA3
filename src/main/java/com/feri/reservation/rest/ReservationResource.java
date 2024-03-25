@@ -2,15 +2,18 @@ package com.feri.reservation.rest;
 
 import com.feri.reservation.model.Reservation;
 import com.feri.reservation.repository.ReservationRepository;
-import io.smallrye.mutiny.Uni; // Reactive
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.jboss.logging.Logger;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Path("/reservations")
@@ -23,18 +26,37 @@ public class ReservationResource {
 
     @Inject
     ReservationRepository reservationRepository;
-
+    @Inject
+    @Channel("reservations")
+    Emitter<String> reservationEmitter;
     @POST
     public Uni<Response> createReservation(Reservation reservation) {
+        // Formatter za lepši izpis datuma in časa
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedReservationDate = reservation.getReservationDate().format(formatter);
+        String formattedExpectedReturnDate = reservation.getExpectedReturnDate().format(formatter);
+
         LOG.infof("Attempting to create a new reservation for bookId: %s and userId: %s", reservation.getBookId(), reservation.getUserId());
         return reservationRepository.persist(reservation)
                 .onItem().transform(inserted -> {
-                    LOG.info("Reservation created successfully.");
+                    // Sestavi sporočilo za RabbitMQ, ki vključuje lepo formatirane datume
+                    String message = String.format(
+                            "New reservation created for bookId: %s, userId: %s, reservationDate: %s, expectedReturnDate: %s",
+                            reservation.getBookId(),
+                            reservation.getUserId(),
+                            formattedReservationDate,
+                            formattedExpectedReturnDate);
+
+                    reservationEmitter.send(message); // Pošlji sporočilo
+                    LOG.info("Reservation created successfully and message sent to RabbitMQ with formatted dates.");
                     return Response.status(Response.Status.CREATED).entity(inserted).build();
                 })
-                .onFailure().invoke(e -> LOG.error("Error creating reservation", e))
+                .onFailure().invoke(e -> LOG.errorf("Error creating reservation", e))
                 .onFailure().recoverWithItem(e -> Response.status(Response.Status.BAD_REQUEST).entity("Error creating reservation: " + e.getMessage()).build());
     }
+
+
+
 
     @GET
     public Uni<Response> getAllReservations() {
