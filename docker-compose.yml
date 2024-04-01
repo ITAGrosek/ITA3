@@ -8,6 +8,8 @@ services:
     command: ["mongod", "--bind_ip_all"]
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - backend-network
 
   reservation-service:
     build:
@@ -20,6 +22,12 @@ services:
       - "8081:8081"
     depends_on:
       - mongodbReservations
+    networks:
+      - backend-network
 
 volumes:
   mongodb_data:
+
+networks:
+  backend-network:
+    external: true

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import java.time.LocalDateTime;
 
 public class ReservationResourceTest {
-
+//če metode za nastavitev in prodidobivanje vrednosti v objektu resevation delujejo pravilno
     @Test
     public void testReservationSettersAndGetters() {
         String expectedUserId = "user123";

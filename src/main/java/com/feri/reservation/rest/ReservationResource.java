@@ -26,10 +26,25 @@ public class ReservationResource {
 
     @Inject
     ReservationRepository reservationRepository;
+
+    //anotacija označuje vmesnik za pošiljanje sporočil v RabbitMQ.
     @Inject
     @Channel("reservations")
     Emitter<String> reservationEmitter;
+
+    /*
+    Emitter<String> je objekt, ki omogoča pošiljanje sporočil v določen kanal (v tem primeru imenovan "reservations").
+    Ko je ustvarjen Emitter, ga lahko uporabimo za pošiljanje sporočil v RabbitMQ, ki bodo potem na voljo
+    za obdelavo drugim komponentam sistema, ki so naročene na ta kanal.
+     */
     @POST
+
+
+    /*
+    Reaktivno programiranje omogoča asinhrono obdelavo dogodkov v realnem času, kar izboljša odzivnost, skalabilnost
+    in robustnost aplikacij z visoko obremenitvijo. Namesto čakanja na zaključek vsake operacije se omogoča vzporedno
+    izvajanje in odziv na dogodke takoj, ko se zgodijo.
+     */
     public Uni<Response> createReservation(Reservation reservation) {
         // Formatter za lepši izpis datuma in časa
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -152,3 +167,8 @@ public class ReservationResource {
                 });
     }
 }
+
+
+/*
+Uni omogoča asinhrono obdelavo rezultatov ali napak, ko postanejo na voljo, brez blokiranja izvajanja.
+ */

@@ -24,6 +24,11 @@ public class Reservation extends PanacheMongoEntity {
     }
 
     // Getterji in setterji, izpustili smo setterje za datume, saj se nastavijo samodejno
+    /*
+
+    Namen tega testa je preveriti, ali metode za nastavitev (setters) in pridobivanje (getters) za lastnosti
+    userId, bookId, reservationDate in expectedReturnDate delujejo pravilno.
+     */
     public String getUserId() {
         return userId;
     }
