@@ -14,8 +14,7 @@ jobs:
       mongodb:
         image: mongo:latest
         ports:
-          - 27019:27017
-
+          - 27017:27017
 
     steps:
       - name: Checkout code
@@ -37,10 +36,10 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Build with Maven
-        run: mvn -B clean package -Dquarkus.mongodb.connection-string=mongodb://localhost:27019/reservations
+        run: mvn -B clean package -Dquarkus.mongodb.connection-string=mongodb://mongodb:27017/reservations
 
       - name: Run tests
-        run: mvn -B test -Dquarkus.mongodb.connection-string=mongodb://localhost:27019/reservations
+        run: mvn -B test -Dquarkus.mongodb.connection-string=mongodb://mongodb:27017/reservations
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
