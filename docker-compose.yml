@@ -1,8 +1,8 @@
 version: '3.8'
 services:
-  mongodbReservations:
+  mongodbreservations:
     image: mongo:latest
-    container_name: mongodbReservations
+    container_name: mongodbreservations
     ports:
       - "27019:27017"
     command: ["mongod", "--bind_ip_all"]
@@ -17,11 +17,11 @@ services:
       dockerfile: Dockerfile
     container_name: reservation-service
     environment:
-      - QUARKUS_MONGODB_CONNECTION_STRING=mongodb://mongodbReservations:27017/reservations
+      - QUARKUS_MONGODB_CONNECTION_STRING=mongodb://mongodbreservations:27017/reservations
     ports:
       - "8081:8081"
     depends_on:
-      - mongodbReservations
+      - mongodbreservations
     networks:
       - backend-network
 
